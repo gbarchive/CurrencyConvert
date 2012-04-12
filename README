@@ -1,0 +1,9 @@
+This is a super simple set of scripts to compute exchange rates. It's use-case is personal (though feel free to use it yourself): I had a set of dated transactions denoted in USD that I needed to convert to CAD. 
+
+If exchange data isn't available, it uses the available surrounding data averaged to compute the estimated exchange rate.
+
+Two executables: CurrencyCSV - one that adds exchange data to a CSV of dates and CurrencyCL - one that simply reports the exchange rate. Data is scraped from a web service, please see Currency.php for more information on how it works.
+
+To use CurrencyCSV.php, by default, create a file that is a list of dates, and make sure dates.out.csv is writable in your directory. Run the script and it will add exchange information to the file in a comma-delimited fashion to be used with your spreadsheet application. If you want something other than USD to CAD, or you wish to use other file names, open CurrencyCSV.php and edit the constants at the top.
+
+To use CurrencyCL.php, run it as php CurrencyCL.php [FROM] [TO] [DATE], where FROM is the currency you're starting at (USD); TO is the currency you want to convert to (CAD) and DATE is the date you're interested in.
