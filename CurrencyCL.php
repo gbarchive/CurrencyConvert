@@ -1,4 +1,11 @@
 <?php
+	/*
+	 * 	A quick command land interface for currency conversion.
+	 *
+	 *	Requires a class called Currency which provides a method getConversion(to, date).
+	 *
+	 */
+
 	require_once "Currency.php";
 
 	date_default_timezone_set("America/Los_Angeles");

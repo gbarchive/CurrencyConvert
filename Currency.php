@@ -1,4 +1,20 @@
 <?php
+	/*	Quick currency converter.
+	 *
+	 *	Written just to quickly fill a CSV with exchange rate data... no sophisticated engineering here
+	 *  just a quick scrape of an existing service. The service in question does not allow their
+	 *	content to be used for public display or any commercial use, so you should honor their terms if
+	 *  you choose to use this library for anything.
+	 *
+	 *	Example usage:
+	 *
+	 *		$currency = new Currency("USD");	// create a converter from USD to x.
+	 *		$exchange_rate = $currency->getConversion("CAD", "December 1, 2011");
+	 *		echo "The exchange rate on December 1, 2011 was {$exchange_rate}."
+	 *
+	 *	Author: Giuseppe Burtini
+	 */
+
 	define("CURRENCY_URL", "http://www.x-rates.com/cgi-bin/hlookup.cgi");
 
 	class Currency {
