@@ -15,9 +15,14 @@
 	 *	Author: Giuseppe Burtini
 	 */
 
-	define("CURRENCY_URL", "http://www.x-rates.com/cgi-bin/hlookup.cgi");
+	define("CURRENCY_URL", "http://www.x-rates.com/historical/");
 
 	class Currency {
+		protected $lookup = array(
+			"CAD" => "Canadian Dollar",
+			"EUR" => "Euro",
+			"USD" => "US Dollar"
+		);
 		private $currency;
 
 		// instantiate with a currency code (ex, USD)
@@ -31,45 +36,54 @@
 			return $pp;	
 		}
 
+		protected function constructURL($url, $array) {
+			if(strpos($url, "?") !== false)
+				$url .= "&";
+			else
+				$url .= "?";
+
+			$url .= http_build_query($array);
+			return $url;
+		}
+
 		private function pullPage($output_currency, $date) {
 			$output_currency = strtoupper($output_currency);
+			$output_search = $this->lookup[$output_currency];
 			
-			$resource = curl_init(CURRENCY_URL);
-			curl_setopt($resource, CURLOPT_POST, true);
-
 			$time = strtotime($date);
-			
-			$month = date("m", $time);
-			$day = date("d", $time);
-			$year = date("Y", $time);
+			$date_string = date("Y-m-d", $time);
 
-			$post_data = array(
-				"ccode2"=>$this->currency,
-				"ccode"=>$output_currency,
-				"frMonth"=>$month-1,
-				"frDay"=>$day,
-				"frYear"=>$year
+			$query = array(
+				"from" => $this->currency,
+				"amount" => "1.00",
+				"date" => $date_string
 			);
+			
 
-			curl_setopt($resource, CURLOPT_POSTFIELDS, $post_data);
+			$resource = curl_init($this->constructURL(CURRENCY_URL, $query));
+//			curl_setopt($resource, CURLOPT_POST, true);
+
+			//curl_setopt($resource, CURLOPT_POSTFIELDS, $post_data);
 			curl_setopt($resource, CURLOPT_REFERER, CURRENCY_URL);
 			curl_setopt($resource, CURLOPT_RETURNTRANSFER, true);
 			$data = curl_exec($resource);
 			curl_close($resource);
 
-			if(preg_match("/no data/", $data)) {
+			if(preg_match("/not available/", $data)) {
 				return false;
 			}
 			
-			$currency_pattern = "/([0-9]*\.[0-9]*) $output_currency/";
-			if(preg_match("/<tr bgcolor=#ccffcc>(.*?)<\/tr>/sim", $data, $matches)) {
+			$currency_pattern = "/([0-9]*\.[0-9]*)/"; // $output_currency/";
+			$search_pattern = "#<a href='/graph/\?from={$this->currency}&amp;to={$output_currency}'>(.*?)</a>#sim";
+			if(preg_match($search_pattern, $data, $matches)) {
 				// we have an exact match
 				preg_match($currency_pattern, $matches[0], $result);
 				$exchange = ($result[1]);
 			} else {
-				preg_match_all("/([0-9]*\.[0-9]*) $output_currency/", $data, $matches);
+//				preg_match_all("/([0-9]*\.[0-9]*) $output_currency/", $data, $matches);
 				// average them
-				$exchange = array_sum($matches[1]) / count($matches[1]);
+//				$exchange = array_sum($matches[1]) / count($matches[1]);
+				return false;
 
 			}
 			return $exchange;

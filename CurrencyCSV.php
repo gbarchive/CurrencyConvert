@@ -19,6 +19,14 @@
 
 	require_once "Currency.php";
 
+	$use_in = FILE;
+	$use_out = FILE_OUT;
+
+	if(isset($argv[1]) && is_readable($argv[1]))
+		$use_in = $argv[1];
+	if(isset($argv[2]) && is_writeable($argv[2]))
+		$use_out = $argv[2];
+	
 	if(defined("TZ") && TZ !== "")
 		date_default_timezone_set(TZ);
 
@@ -26,7 +34,7 @@
 
 	$dates = array();
 	
-	$fh = fopen(FILE, "r");
+	$fh = fopen($use_in, "r");
 	
 	while(($date = fgetcsv($fh)) !== false) {
 		$date = $date[0];
@@ -44,7 +52,7 @@
 	}
 
 	fclose($fh);
-	$fh = fopen(FILE_OUT, "w+");
+	$fh = fopen($use_out, "w+");
 
 	foreach($dates as $date) {
 		fputcsv($fh, $date);
